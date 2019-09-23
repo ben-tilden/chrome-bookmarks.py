@@ -66,22 +66,25 @@ class Bookmarks:
     @property
     def folders(self):
         items = []
-        for key, childrens in json.loads(open(path).read())["roots"]["bookmark_bar"].items():
-            if key == "children":
-                for children in childrens:
-                    if "type" in children and children["type"] == "folder":
-                        items.append(Item(children))
+        for key, value in json.loads(open(path).read())["roots"].items():
+            if "children" in value:
+                self.getAttrFromRoot(items, value["children"], "folder")
         return items
 
     @property
     def urls(self):
         items = []
-        for key, childrens in self.data["roots"]["bookmark_bar"].items():
-            if key == "children":
-                for children in childrens:
-                    if "type" in children and children["type"] == "url":
-                        items.append(Item(children))
+        for key, value in json.loads(open(path).read())["roots"].items():
+            if "children" in value:
+                self.getAttrFromRoot(items, value["children"], "url")
         return items
+
+    def getAttrFromRoot(self, items, childrenList, attr):
+        for item in childrenList:
+            if "type" in item and item["type"] == attr:
+                items.append(Item(item))
+            if "children" in item:
+                self.getAttrFromRoot(items, item["children"], attr)
 
 
 paths = [
